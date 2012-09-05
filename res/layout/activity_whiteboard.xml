@@ -1,0 +1,46 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="70dip"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:background="@android:color/black"
+        android:orientation="vertical"
+        android:padding="5dip"
+        tools:context=".WhiteboardActivity" >
+
+        <ImageButton
+            android:id="@+id/saveButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_menu_save" />
+
+        <ImageButton
+            android:id="@+id/deleteButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_menu_delete" />
+
+        <ImageButton
+            android:id="@+id/undoButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_menu_revert" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/whiteboardWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@+id/toolbar" />
+
+</RelativeLayout>

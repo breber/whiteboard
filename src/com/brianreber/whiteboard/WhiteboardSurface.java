@@ -78,6 +78,13 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 		}
 	}
 
+	/**
+	 * Clear the canvas
+	 */
+	public void clearCanvas() {
+		mPaths.clear();
+	}
+
 	/* (non-Javadoc)
 	 * @see android.view.View#onTouchEvent(android.view.MotionEvent)
 	 */
@@ -104,6 +111,8 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	 */
 	@Override
 	public void onDraw(Canvas canvas) {
+		canvas.drawColor(Color.WHITE);
+
 		for (Path path : mPaths) {
 			canvas.drawPath(path, mPaint);
 		}
