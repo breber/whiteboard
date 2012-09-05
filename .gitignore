@@ -1,0 +1,4 @@
+*.class
+res/
+bin/
+gen/
