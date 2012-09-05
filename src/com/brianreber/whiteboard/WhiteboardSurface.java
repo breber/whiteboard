@@ -13,12 +13,14 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.brianreber.whiteboard.ColorPickerDialog.OnColorChangedListener;
+
 /**
  * The SurfaceView allowing drawing
  * 
  * @author breber
  */
-public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Callback {
+public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Callback, OnColorChangedListener {
 
 	/**
 	 * The Thread that updates the UI
@@ -28,7 +30,7 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	/**
 	 * A list of paths that are drawn on the screen
 	 */
-	private List<Path> mPaths = new ArrayList<Path>();
+	private List<PathWrapper> mPaths = new ArrayList<PathWrapper>();
 
 	/**
 	 * The current path being updated
@@ -73,8 +75,10 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	 * Performs an undo operation
 	 */
 	public void undo() {
-		if (mPaths.size() > 0) {
-			mPaths.remove(mPaths.size() - 1);
+		synchronized (mThread.getSurfaceHolder()) {
+			if (mPaths.size() > 0) {
+				mPaths.remove(mPaths.size() - 1);
+			}
 		}
 	}
 
@@ -82,7 +86,27 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	 * Clear the canvas
 	 */
 	public void clearCanvas() {
-		mPaths.clear();
+		synchronized (mThread.getSurfaceHolder()) {
+			mPaths.clear();
+		}
+	}
+
+	/**
+	 * Get the color of the Paint
+	 * 
+	 * @return the paint color
+	 */
+	public int getColor() {
+		return mPaint.getColor();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.brianreber.whiteboard.ColorPickerDialog.OnColorChangedListener#colorChanged(int)
+	 */
+	@Override
+	public void colorChanged(int color) {
+		mPaint = new Paint(mPaint);
+		mPaint.setColor(color);
 	}
 
 	/* (non-Javadoc)
@@ -95,7 +119,7 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 				mPath = new Path();
 				mPath.moveTo(event.getX(), event.getY());
 				mPath.lineTo(event.getX(), event.getY());
-				mPaths.add(mPath);
+				mPaths.add(new PathWrapper(mPath, mPaint));
 			} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
 				mPath.lineTo(event.getX(), event.getY());
 			} else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -113,8 +137,8 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	public void onDraw(Canvas canvas) {
 		canvas.drawColor(Color.WHITE);
 
-		for (Path path : mPaths) {
-			canvas.drawPath(path, mPaint);
+		for (PathWrapper path : mPaths) {
+			canvas.drawPath(path.getPath(), path.getPaint());
 		}
 	}
 

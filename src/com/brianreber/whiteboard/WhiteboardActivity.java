@@ -1,6 +1,7 @@
 package com.brianreber.whiteboard;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,6 +25,9 @@ public class WhiteboardActivity extends Activity {
 
 		LinearLayout v = (LinearLayout) findViewById(R.id.whiteboardWrapper);
 		v.addView(mSurface);
+
+		// TODO: color
+		// TODO: size
 
 		ImageButton saveButton = (ImageButton) findViewById(R.id.saveButton);
 		saveButton.setOnClickListener(new OnClickListener() {
@@ -50,6 +54,17 @@ public class WhiteboardActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				mSurface.undo();
+			}
+		});
+
+		ImageButton colorButton = (ImageButton) findViewById(R.id.colorButton);
+		colorButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				int swatchColor = mSurface.getColor();
+
+				Dialog dlg = new ColorPickerDialog(WhiteboardActivity.this, mSurface, swatchColor);
+				dlg.show();
 			}
 		});
 	}

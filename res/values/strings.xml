@@ -2,5 +2,6 @@
 
     <string name="app_name">Whiteboard</string>
     <string name="title_activity_whiteboard">WhiteboardActivity</string>
+    <string name="chooseColor">Choose Color</string>
 
 </resources>
