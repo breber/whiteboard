@@ -42,6 +42,11 @@ public class WhiteboardActivity extends Activity {
 	private static final int SHARE_RESULT = Math.abs("SHARE".hashCode());
 
 	/**
+	 * Activity result from preferences activity
+	 */
+	private static final int PREFS_RESULT = Math.abs("PREFERENCES".hashCode());
+
+	/**
 	 * The path to the image that is shared
 	 */
 	private static final String sShareFileName = "whiteboardshared.png";
@@ -72,6 +77,10 @@ public class WhiteboardActivity extends Activity {
 		setContentView(R.layout.activity_whiteboard);
 
 		mSurface = new WhiteboardSurface(this);
+
+		// Set multitouch
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		mSurface.setMultitouch(prefs.getBoolean(getString(R.string.prefMultitouchEnabled), true));
 
 		LinearLayout v = (LinearLayout) findViewById(R.id.whiteboardWrapper);
 		v.addView(mSurface);
@@ -149,9 +158,9 @@ public class WhiteboardActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-					startActivity(new Intent(WhiteboardActivity.this, WhiteboardPreferenceActivity.class));
+					startActivityForResult(new Intent(WhiteboardActivity.this, WhiteboardPreferenceActivity.class), PREFS_RESULT);
 				} else {
-					startActivity(new Intent(WhiteboardActivity.this, WhiteboardPreferenceActivitySupport.class));
+					startActivityForResult(new Intent(WhiteboardActivity.this, WhiteboardPreferenceActivitySupport.class), PREFS_RESULT);
 				}
 			}
 		});
@@ -197,11 +206,15 @@ public class WhiteboardActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// When we return from the share intent, delete the temp file
-		if (SHARE_RESULT == resultCode) {
+		if (SHARE_RESULT == requestCode) {
 			File f = getFileStreamPath(sShareFileName);
 			if (f.exists()) {
 				f.delete();
 			}
+		} else if (PREFS_RESULT == requestCode) {
+			// When we return from the preferences, update the Whiteboard Surface
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+			mSurface.setMultitouch(prefs.getBoolean(getString(R.string.prefMultitouchEnabled), true));
 		}
 
 		super.onActivityResult(requestCode, resultCode, data);

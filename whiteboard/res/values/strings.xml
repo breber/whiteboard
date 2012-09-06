@@ -5,5 +5,7 @@
     <string name="backCausesUndo">Back button performs undo</string>
     <string name="prefBackUndo">backUndo</string>
     <string name="unlinkDropbox">Unlink Dropbox</string>
+    <string name="prefMultitouchEnabled">multitouchDrawing</string>
+    <string name="enableMultitouch">Multitouch Drawing</string>
 
 </resources>

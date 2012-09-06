@@ -5,5 +5,9 @@
         android:defaultValue="true"
         android:key="@string/prefBackUndo"
         android:title="@string/backCausesUndo" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/prefMultitouchEnabled"
+        android:title="@string/enableMultitouch" />
 
 </PreferenceScreen>

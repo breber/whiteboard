@@ -43,6 +43,11 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	private Paint mPaint;
 
 	/**
+	 * Represents whether multitouch drawing is enabled
+	 */
+	private boolean enableMultitouch = true;
+
+	/**
 	 * Create a new WhiteboardSurface
 	 * 
 	 * @param context
@@ -53,12 +58,12 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 		setFocusable(true);
 
 		mPaint = new Paint();
-		mPaint.setDither(true);
+		mPaint.setDither(false);
 		mPaint.setColor(Color.BLACK);
 		mPaint.setStyle(Paint.Style.STROKE);
 		mPaint.setStrokeJoin(Paint.Join.ROUND);
 		mPaint.setStrokeCap(Paint.Cap.ROUND);
-		mPaint.setStrokeWidth(10);
+		mPaint.setStrokeWidth(7);
 	}
 
 	/**
@@ -108,6 +113,15 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 		return mPaint.getColor();
 	}
 
+	/**
+	 * Enable/disable multitouch
+	 * 
+	 * @param aMultitouchEnabled
+	 */
+	public void setMultitouch(boolean aMultitouchEnabled) {
+		enableMultitouch = aMultitouchEnabled;
+	}
+
 	/* (non-Javadoc)
 	 * @see net.margaritov.preference.colorpicker.ColorPickerDialog.OnColorChangedListener#onColorChanged(int)
 	 */
@@ -126,6 +140,9 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 			final int action = event.getAction();
 			switch (action & MotionEvent.ACTION_MASK) {
 			case MotionEvent.ACTION_POINTER_DOWN:
+				if (!enableMultitouch) {
+					break;
+				}
 			case MotionEvent.ACTION_DOWN: {
 				final int pointerIndex = event.getActionIndex();
 				final int pointerId = event.getPointerId(pointerIndex);
