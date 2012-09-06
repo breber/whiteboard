@@ -2,5 +2,8 @@
 
     <string name="app_name">Whiteboard</string>
     <string name="chooseColor">Choose Color</string>
+    <string name="backCausesUndo">Back button causes undo</string>
+    <string name="prefBackUndo">backUndo</string>
+    <string name="unlinkDropbox">Unlink Dropbox</string>
 
 </resources>

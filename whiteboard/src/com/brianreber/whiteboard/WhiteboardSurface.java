@@ -77,10 +77,14 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	/**
 	 * Performs an undo operation
 	 */
-	public void undo() {
+	public boolean undo() {
 		synchronized (mThread.getSurfaceHolder()) {
 			if (mPaths.size() > 0) {
 				mPaths.remove(mPaths.size() - 1);
+
+				return true;
+			} else {
+				return false;
 			}
 		}
 	}
