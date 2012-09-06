@@ -1,7 +1,9 @@
 package com.brianreber.whiteboard;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.margaritov.preference.colorpicker.ColorPickerDialog.OnColorChangedListener;
 import android.content.Context;
@@ -34,7 +36,7 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	/**
 	 * The current path being updated
 	 */
-	private Path mPath;
+	private Map<Integer, Path> mPathMap = new HashMap<Integer, Path>();
 
 	/**
 	 * The painting parameters for the current Path
@@ -122,15 +124,68 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		synchronized (mThread.getSurfaceHolder()) {
-			if (event.getAction() == MotionEvent.ACTION_DOWN) {
-				mPath = new Path();
-				mPath.moveTo(event.getX(), event.getY());
-				mPath.lineTo(event.getX(), event.getY());
-				mPaths.add(new PathWrapper(mPath, mPaint));
-			} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-				mPath.lineTo(event.getX(), event.getY());
-			} else if (event.getAction() == MotionEvent.ACTION_UP) {
-				mPath.lineTo(event.getX(), event.getY());
+			final int action = event.getAction();
+			switch (action & MotionEvent.ACTION_MASK) {
+			case MotionEvent.ACTION_POINTER_DOWN:
+			case MotionEvent.ACTION_DOWN: {
+				final int pointerIndex = event.getActionIndex();
+				final int pointerId = event.getPointerId(pointerIndex);
+				final float x = event.getX(pointerIndex);
+				final float y = event.getY(pointerIndex);
+
+				Path path = new Path();
+				path.moveTo(x, y);
+				path.lineTo(x, y);
+
+				mPathMap.put(pointerId, path);
+				mPaths.add(new PathWrapper(path, mPaint));
+				break;
+			}
+
+			case MotionEvent.ACTION_MOVE: {
+				// Add the historical data
+				for (int h = 0; h < event.getHistorySize(); h++) {
+					for (int p = 0; p < event.getPointerCount(); p++) {
+						final float x = event.getHistoricalX(p, h);
+						final float y = event.getHistoricalY(p, h);
+						final int pointerId = event.getPointerId(p);
+
+						Path path = mPathMap.get(pointerId);
+						if (path != null) {
+							path.lineTo(x, y);
+						}
+					}
+				}
+
+				// Add current data
+				for (int p = 0; p < event.getPointerCount(); p++) {
+					final float x = event.getX(p);
+					final float y = event.getY(p);
+					final int pointerId = event.getPointerId(p);
+					Path path = mPathMap.get(pointerId);
+					if (path != null) {
+						path.lineTo(x, y);
+					}
+				}
+
+				break;
+			}
+
+			case MotionEvent.ACTION_UP:
+			case MotionEvent.ACTION_CANCEL:
+			case MotionEvent.ACTION_POINTER_UP: {
+				// Extract the index of the pointer that left the touch sensor
+				final int pointerIndex = event.getActionIndex();
+				final int pointerId = event.getPointerId(pointerIndex);
+				final float x = event.getX(pointerIndex);
+				final float y = event.getY(pointerIndex);
+
+				Path path = mPathMap.remove(pointerId);
+				if (path != null) {
+					path.lineTo(x, y);
+				}
+				break;
+			}
 			}
 
 			return true;
