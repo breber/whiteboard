@@ -54,7 +54,7 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 
 		mPaint = new Paint();
 		mPaint.setDither(true);
-		mPaint.setColor(Color.RED);
+		mPaint.setColor(Color.BLACK);
 		mPaint.setStyle(Paint.Style.STROKE);
 		mPaint.setStrokeJoin(Paint.Join.ROUND);
 		mPaint.setStrokeCap(Paint.Cap.ROUND);

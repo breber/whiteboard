@@ -5,7 +5,9 @@ import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
@@ -14,9 +16,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.Entry;
@@ -54,6 +56,16 @@ public class WhiteboardActivity extends Activity {
 	 */
 	private WhiteboardSurface mSurface;
 
+	/**
+	 * Are we currently saving?
+	 */
+	private boolean isSaving = false;
+
+	/**
+	 * The filename
+	 */
+	private String fileName = null;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -79,34 +91,8 @@ public class WhiteboardActivity extends Activity {
 		saveButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO: save image...
-
-				if (mDBApi.getSession().isLinked()) {
-					new Thread(new Runnable() {
-						@Override
-						public void run() {
-							Bitmap bitmap = mSurface.getBitmap();
-							ByteArrayOutputStream bos = new ByteArrayOutputStream();
-							bitmap.compress(CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
-							byte[] bitmapdata = bos.toByteArray();
-							ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
-
-							try {
-								Entry newEntry = mDBApi.putFile(new Date().toString() + ".png", bs, bitmapdata.length, null, null);
-								Log.i("DbExampleLog", "The uploaded file's rev is: " + newEntry.rev);
-							} catch (DropboxUnlinkedException e) {
-								// User has unlinked, ask them to link again here.
-								Log.e("DbExampleLog", "User has unlinked.");
-							} catch (DropboxException e) {
-								Log.e("DbExampleLog", "Something went wrong while uploading.");
-							}
-						}
-					}).start();
-				} else {
-					mDBApi.getSession().startAuthentication(WhiteboardActivity.this);
-				}
-
-				Toast.makeText(WhiteboardActivity.this, "Saving...", Toast.LENGTH_SHORT).show();
+				isSaving = true;
+				performSave();
 			}
 		});
 
@@ -117,6 +103,7 @@ public class WhiteboardActivity extends Activity {
 				// TODO: maybe popup to make sure?
 
 				mSurface.clearCanvas();
+				fileName = null;
 			}
 		});
 
@@ -161,7 +148,97 @@ public class WhiteboardActivity extends Activity {
 			} catch (IllegalStateException e) {
 				Log.i("DbAuthLog", "Error authenticating", e);
 			}
+
+			if (isSaving) {
+				performSave();
+			}
 		}
+	}
+
+	/**
+	 * Start performing the save
+	 * 
+	 * Prompt the user for a filename if they are logged in to Dropbox. If they
+	 * aren't logged in to Dropbox, start the Dropbox authentication
+	 */
+	private void performSave() {
+		if (mDBApi.getSession().isLinked()) {
+			if (fileName != null) {
+				saveToDropbox(fileName, true);
+			} else {
+				AlertDialog.Builder dlg = new AlertDialog.Builder(WhiteboardActivity.this);
+
+				dlg.setTitle("Save As");
+				dlg.setMessage("Choose a file name");
+
+				// Set an EditText view to get user input
+				final EditText input = new EditText(WhiteboardActivity.this);
+				input.setText(new Date().toString());
+				input.selectAll();
+				dlg.setView(input);
+
+				dlg.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int whichButton) {
+						final String value = input.getText().toString();
+
+						fileName = value;
+						saveToDropbox(value, false);
+					}
+				});
+
+				dlg.show();
+			}
+			isSaving = false;
+		} else {
+			mDBApi.getSession().startAuthentication(WhiteboardActivity.this);
+		}
+	}
+
+	/**
+	 * Get the image and save it to Dropbox
+	 * 
+	 * @param fileName the name to save the file as
+	 * @param overwrite should we overwrite the file if it exists?
+	 */
+	private void saveToDropbox(final String fileName, final boolean overwrite) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Bitmap bitmap = mSurface.getBitmap();
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				bitmap.compress(CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+				byte[] bitmapdata = bos.toByteArray();
+				ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
+
+				try {
+					Entry newEntry;
+
+					String fullFileName = fileName;
+
+					// Make sure it ends in ".png"
+					if (!fullFileName.endsWith(".png")) {
+						fullFileName = fullFileName + ".png";
+					}
+
+					if (overwrite) {
+						newEntry = mDBApi.putFileOverwrite(fullFileName, bs, bitmapdata.length, null);
+					} else {
+						newEntry = mDBApi.putFile(fullFileName, bs, bitmapdata.length, null, null);
+					}
+
+					// Update the filename if it was modified
+					WhiteboardActivity.this.fileName = newEntry.fileName();
+
+					Log.i("DbExampleLog", "The uploaded file's rev is: " + newEntry.rev);
+				} catch (DropboxUnlinkedException e) {
+					// User has unlinked, ask them to link again here.
+					Log.e("DbExampleLog", "User has unlinked.");
+				} catch (DropboxException e) {
+					Log.e("DbExampleLog", "Something went wrong while uploading.");
+				}
+			}
+		}).start();
 	}
 
 	/**

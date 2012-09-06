@@ -4,7 +4,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="6"
         android:targetSdkVersion="16" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -15,7 +15,6 @@
         android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar.Fullscreen" >
         <activity
             android:name=".WhiteboardActivity"
-            android:label="@string/title_activity_whiteboard"
             android:screenOrientation="sensorLandscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
