@@ -1,9 +1,7 @@
 package com.brianreber.whiteboard;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.margaritov.preference.colorpicker.ColorPickerDialog.OnColorChangedListener;
 import android.content.Context;
@@ -12,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -36,7 +35,7 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	/**
 	 * The current path being updated
 	 */
-	private Map<Integer, Path> mPathMap = new HashMap<Integer, Path>();
+	private SparseArray<Path> mPathMap = new SparseArray<Path>();
 
 	/**
 	 * The painting parameters for the current Path
@@ -180,7 +179,8 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 				final float x = event.getX(pointerIndex);
 				final float y = event.getY(pointerIndex);
 
-				Path path = mPathMap.remove(pointerId);
+				Path path = mPathMap.get(pointerId);
+				mPathMap.remove(pointerId);
 				if (path != null) {
 					path.lineTo(x, y);
 				}
