@@ -7,10 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
+import net.margaritov.preference.colorpicker.ColorPickerDialog;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -138,8 +138,9 @@ public class WhiteboardActivity extends Activity {
 			public void onClick(View v) {
 				int swatchColor = mSurface.getColor();
 
-				Dialog dlg = new ColorPickerDialog(WhiteboardActivity.this, mSurface, swatchColor);
-				dlg.show();
+				ColorPickerDialog cpd = new ColorPickerDialog(WhiteboardActivity.this, swatchColor);
+				cpd.setOnColorChangedListener(mSurface);
+				cpd.show();
 			}
 		});
 

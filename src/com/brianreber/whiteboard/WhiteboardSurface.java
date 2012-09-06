@@ -3,6 +3,7 @@ package com.brianreber.whiteboard;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.margaritov.preference.colorpicker.ColorPickerDialog.OnColorChangedListener;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -12,8 +13,6 @@ import android.graphics.Path;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import com.brianreber.whiteboard.ColorPickerDialog.OnColorChangedListener;
 
 /**
  * The SurfaceView allowing drawing
@@ -105,10 +104,10 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	}
 
 	/* (non-Javadoc)
-	 * @see com.brianreber.whiteboard.ColorPickerDialog.OnColorChangedListener#colorChanged(int)
+	 * @see net.margaritov.preference.colorpicker.ColorPickerDialog.OnColorChangedListener#onColorChanged(int)
 	 */
 	@Override
-	public void colorChanged(int color) {
+	public void onColorChanged(int color) {
 		mPaint = new Paint(mPaint);
 		mPaint.setColor(color);
 	}
