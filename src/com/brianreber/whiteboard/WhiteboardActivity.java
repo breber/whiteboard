@@ -2,16 +2,23 @@ package com.brianreber.whiteboard;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -32,6 +39,11 @@ import com.dropbox.client2.session.Session.AccessType;
 public class WhiteboardActivity extends Activity {
 
 	/**
+	 * Activity result from sharing the image
+	 */
+	private static final int SHARE_RESULT = Math.abs("SHARE".hashCode());
+
+	/**
 	 * Dropbox App Key
 	 */
 	private static final String APP_KEY = "sipz3v1k0xkmftv";
@@ -45,6 +57,11 @@ public class WhiteboardActivity extends Activity {
 	 * Dropbox Access Type
 	 */
 	private static final AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
+
+	/**
+	 * The path to the image that is shared
+	 */
+	private static final String sShareFileName = "whiteboardshared.png";
 
 	/**
 	 * Dropbox API Access
@@ -125,6 +142,30 @@ public class WhiteboardActivity extends Activity {
 				dlg.show();
 			}
 		});
+
+		ImageButton shareButton = (ImageButton) findViewById(R.id.shareButton);
+		shareButton.setOnClickListener(new OnClickListener() {
+			@SuppressLint("WorldReadableFiles")
+			@Override
+			public void onClick(View v) {
+				Intent share = new Intent(Intent.ACTION_SEND);
+				share.setType("image/png");
+
+				try {
+					FileOutputStream fos = WhiteboardActivity.this.openFileOutput(sShareFileName, Context.MODE_WORLD_READABLE);
+					File f = getFileStreamPath(sShareFileName);
+					Bitmap bitmap = mSurface.getBitmap();
+					bitmap.compress(CompressFormat.PNG, 0, fos);
+
+					share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f));
+
+					startActivityForResult(Intent.createChooser(share, "Share image:"), SHARE_RESULT);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	/* (non-Javadoc)
@@ -153,6 +194,22 @@ public class WhiteboardActivity extends Activity {
 				performSave();
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
+	 */
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// When we return from the share intent, delete the temp file
+		if (SHARE_RESULT == resultCode) {
+			File f = getFileStreamPath(sShareFileName);
+			if (f.exists()) {
+				f.delete();
+			}
+		}
+
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 	/**
