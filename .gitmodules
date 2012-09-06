@@ -1,0 +1,3 @@
+[submodule "colorpicker"]
+	path = colorpicker
+	url = https://github.com/breber/android-ColorPickerPreference.git
