@@ -67,7 +67,11 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	 * @return a Bitmap of the current state
 	 */
 	public Bitmap getBitmap() {
-		Bitmap bitmap = this.getDrawingCache();
+		Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+		Canvas canvas = new Canvas(bitmap);
+
+		onDraw(canvas);
+
 		return bitmap;
 	}
 
