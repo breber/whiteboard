@@ -123,9 +123,11 @@ public class WhiteboardActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				int swatchColor = mSurface.getColor();
+				int penSize = mSurface.getPenSize();
 
-				ColorPickerDialog cpd = new ColorPickerDialog(WhiteboardActivity.this, swatchColor);
+				ColorPickerDialog cpd = new ColorPickerDialog(WhiteboardActivity.this, swatchColor, penSize);
 				cpd.setOnColorChangedListener(mSurface);
+				cpd.setOnPenSizeChangedListener(mSurface);
 				cpd.show();
 			}
 		});

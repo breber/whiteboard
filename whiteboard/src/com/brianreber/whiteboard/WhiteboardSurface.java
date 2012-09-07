@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.margaritov.preference.colorpicker.ColorPickerDialog.OnColorChangedListener;
+import net.margaritov.preference.colorpicker.ColorPickerDialog.OnPenSizeChangedListener;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -20,7 +21,7 @@ import android.view.SurfaceView;
  * 
  * @author breber
  */
-public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Callback, OnColorChangedListener {
+public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Callback, OnColorChangedListener, OnPenSizeChangedListener {
 
 	/**
 	 * The Thread that updates the UI
@@ -114,12 +115,30 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	}
 
 	/**
+	 * Get the current pen size
+	 * 
+	 * @return the current pen size
+	 */
+	public int getPenSize() {
+		return (int) mPaint.getStrokeWidth();
+	}
+
+	/**
 	 * Enable/disable multitouch
 	 * 
 	 * @param aMultitouchEnabled
 	 */
 	public void setMultitouch(boolean aMultitouchEnabled) {
 		enableMultitouch = aMultitouchEnabled;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.margaritov.preference.colorpicker.ColorPickerDialog.OnPenSizeChangedListener#onSizeChanged(int)
+	 */
+	@Override
+	public void onSizeChanged(int size) {
+		mPaint = new Paint(mPaint);
+		mPaint.setStrokeWidth(size);
 	}
 
 	/* (non-Javadoc)
