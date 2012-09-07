@@ -1,5 +1,6 @@
 package com.brianreber.whiteboard;
 
+import android.annotation.TargetApi;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
@@ -8,6 +9,7 @@ import android.preference.PreferenceFragment;
  * 
  * @author breber
  */
+@TargetApi(11)
 public class WhiteboardPreferenceFragment extends PreferenceFragment {
 
 	@Override
