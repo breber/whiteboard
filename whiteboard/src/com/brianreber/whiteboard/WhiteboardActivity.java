@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,14 +28,21 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.DropboxAPI.DropboxInputStream;
 import com.dropbox.client2.DropboxAPI.Entry;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.exception.DropboxUnlinkedException;
 
 public class WhiteboardActivity extends Activity {
+
+	/**
+	 * Activity result from opening the image
+	 */
+	private static final int OPEN_RESULT = Math.abs("OPEN".hashCode());
 
 	/**
 	 * Activity result from sharing the image
@@ -64,12 +72,12 @@ public class WhiteboardActivity extends Activity {
 	/**
 	 * Are we currently saving?
 	 */
-	private boolean isSaving = false;
+	private boolean mIsSaving = false;
 
 	/**
 	 * The filename
 	 */
-	private String fileName = null;
+	private String mFileName = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -88,14 +96,25 @@ public class WhiteboardActivity extends Activity {
 		// Get access to Dropbox API
 		mDBApi = DropboxUtils.getDropboxApi(this);
 
-		// TODO: size
-
 		ImageButton saveButton = (ImageButton) findViewById(R.id.saveButton);
 		saveButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				isSaving = true;
+				mIsSaving = true;
 				performSave();
+			}
+		});
+
+		ImageButton openButton = (ImageButton) findViewById(R.id.openButton);
+		openButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mDBApi.getSession().isLinked()) {
+					Intent i = new Intent(WhiteboardActivity.this, ListDropboxFiles.class);
+					startActivityForResult(i, OPEN_RESULT);
+				} else {
+					mDBApi.getSession().startAuthentication(WhiteboardActivity.this);
+				}
 			}
 		});
 
@@ -106,7 +125,7 @@ public class WhiteboardActivity extends Activity {
 				// TODO: maybe popup to make sure?
 
 				mSurface.clearCanvas();
-				fileName = null;
+				mFileName = null;
 			}
 		});
 
@@ -196,7 +215,7 @@ public class WhiteboardActivity extends Activity {
 		if (mDBApi.getSession().authenticationSuccessful()) {
 			DropboxUtils.finishAuthentication(this);
 
-			if (isSaving) {
+			if (mIsSaving) {
 				performSave();
 			}
 		}
@@ -217,6 +236,23 @@ public class WhiteboardActivity extends Activity {
 			// When we return from the preferences, update the Whiteboard Surface
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			mSurface.setMultitouch(prefs.getBoolean(getString(R.string.prefMultitouchEnabled), true));
+		} else if (OPEN_RESULT == requestCode && RESULT_OK == resultCode) {
+			final String fileName = data.getStringExtra("fileName");
+			Toast.makeText(this, "Opening file..." + fileName, Toast.LENGTH_SHORT).show();
+
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						DropboxInputStream dis = mDBApi.getFileStream(fileName, null);
+						Bitmap bm = BitmapFactory.decodeStream(dis);
+						mSurface.setBaseBitmap(bm);
+						mFileName = fileName;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
 		}
 
 		super.onActivityResult(requestCode, resultCode, data);
@@ -230,8 +266,8 @@ public class WhiteboardActivity extends Activity {
 	 */
 	private void performSave() {
 		if (mDBApi.getSession().isLinked()) {
-			if (fileName != null) {
-				saveToDropbox(fileName, true);
+			if (mFileName != null) {
+				saveToDropbox(mFileName, true);
 			} else {
 				AlertDialog.Builder dlg = new AlertDialog.Builder(WhiteboardActivity.this);
 
@@ -249,14 +285,14 @@ public class WhiteboardActivity extends Activity {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						final String value = input.getText().toString();
 
-						fileName = value;
+						mFileName = value;
 						saveToDropbox(value, false);
 					}
 				});
 
 				dlg.show();
 			}
-			isSaving = false;
+			mIsSaving = false;
 		} else {
 			mDBApi.getSession().startAuthentication(WhiteboardActivity.this);
 		}
@@ -295,7 +331,7 @@ public class WhiteboardActivity extends Activity {
 					}
 
 					// Update the filename if it was modified
-					WhiteboardActivity.this.fileName = newEntry.fileName();
+					WhiteboardActivity.this.mFileName = newEntry.fileName();
 
 					Log.i("DbExampleLog", "The uploaded file's rev is: " + newEntry.rev);
 				} catch (DropboxUnlinkedException e) {

@@ -21,6 +21,14 @@
             android:src="@drawable/ic_menu_save" />
 
         <ImageButton
+            android:id="@+id/openButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_menu_view" />
+
+        <ImageButton
             android:id="@+id/deleteButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1,12 +1,17 @@
 package com.brianreber.whiteboard;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.DropboxAPI.Entry;
 import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
@@ -167,6 +172,27 @@ public class DropboxUtils {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Get a list of files
+	 * 
+	 * @return a list of files
+	 */
+	public static List<String> getListOfFiles() {
+		List<String> toRet = new ArrayList<String>();
+
+		try {
+			List<Entry> result = sCurrentSession.search("", ".png", 0, false);
+
+			for (Entry e : result) {
+				toRet.add(e.fileName());
+			}
+		} catch (DropboxException e) {
+			e.printStackTrace();
+		}
+
+		return toRet;
 	}
 
 }

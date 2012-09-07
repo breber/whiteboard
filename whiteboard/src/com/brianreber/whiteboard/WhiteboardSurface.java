@@ -29,6 +29,11 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	private CanvasThread mThread;
 
 	/**
+	 * The base bitmap
+	 */
+	private Bitmap mBaseBitmap = null;
+
+	/**
 	 * A list of paths that are drawn on the screen
 	 */
 	private List<PathWrapper> mPaths = new ArrayList<PathWrapper>();
@@ -82,6 +87,18 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	}
 
 	/**
+	 * Set the base bitmap
+	 * 
+	 * @param aBitmap
+	 */
+	public void setBaseBitmap(Bitmap aBitmap) {
+		synchronized (mThread.getSurfaceHolder()) {
+			mPaths.clear();
+			mBaseBitmap = aBitmap;
+		}
+	}
+
+	/**
 	 * Performs an undo operation
 	 */
 	public boolean undo() {
@@ -102,6 +119,7 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	public void clearCanvas() {
 		synchronized (mThread.getSurfaceHolder()) {
 			mPaths.clear();
+			mBaseBitmap = null;
 		}
 	}
 
@@ -234,6 +252,10 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	@Override
 	public void onDraw(Canvas canvas) {
 		canvas.drawColor(Color.WHITE);
+
+		if (mBaseBitmap != null) {
+			canvas.drawBitmap(mBaseBitmap, 0, 0, null);
+		}
 
 		for (PathWrapper path : mPaths) {
 			canvas.drawPath(path.getPath(), path.getPaint());

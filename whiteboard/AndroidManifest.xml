@@ -22,6 +22,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ListDropboxFiles"
+            android:theme="@android:style/Theme.DeviceDefault.Light.DialogWhenLarge" />
         <activity android:name=".WhiteboardPreferenceActivity" />
         <activity android:name=".WhiteboardPreferenceActivitySupport" />
         <activity
