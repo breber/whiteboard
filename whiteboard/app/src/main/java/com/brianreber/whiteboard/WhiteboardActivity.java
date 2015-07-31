@@ -112,7 +112,7 @@ public class WhiteboardActivity extends Activity {
 					Intent i = new Intent(WhiteboardActivity.this, ListDropboxFiles.class);
 					startActivityForResult(i, OPEN_RESULT);
 				} else {
-					mDBApi.getSession().startAuthentication(WhiteboardActivity.this);
+					mDBApi.getSession().startOAuth2Authentication(WhiteboardActivity.this);
 				}
 			}
 		});
@@ -159,7 +159,7 @@ public class WhiteboardActivity extends Activity {
 				share.setType("image/png");
 
 				try {
-					FileOutputStream fos = WhiteboardActivity.this.openFileOutput(sShareFileName, Context.MODE_WORLD_READABLE);
+					FileOutputStream fos = WhiteboardActivity.this.openFileOutput(sShareFileName, Context.MODE_PRIVATE);
 					File f = getFileStreamPath(sShareFileName);
 					Bitmap bitmap = mSurface.getBitmap();
 					bitmap.compress(CompressFormat.PNG, 0, fos);
@@ -293,7 +293,7 @@ public class WhiteboardActivity extends Activity {
 			}
 			mIsSaving = false;
 		} else {
-			mDBApi.getSession().startAuthentication(WhiteboardActivity.this);
+			mDBApi.getSession().startOAuth2Authentication(WhiteboardActivity.this);
 		}
 	}
 

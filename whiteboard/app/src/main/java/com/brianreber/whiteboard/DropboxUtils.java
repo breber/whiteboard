@@ -1,8 +1,5 @@
 package com.brianreber.whiteboard;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -14,7 +11,9 @@ import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
-import com.dropbox.client2.session.Session.AccessType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DropboxUtils {
 
@@ -44,11 +43,6 @@ public class DropboxUtils {
 	private static final String APP_SECRET = "azlt2f1yyr2xmo8";
 
 	/**
-	 * Dropbox Access Type
-	 */
-	private static final AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
-
-	/**
 	 * The current Dropbox Session
 	 */
 	private static DropboxAPI<AndroidAuthSession> sCurrentSession = null;
@@ -63,8 +57,8 @@ public class DropboxUtils {
 	 */
 	public static DropboxAPI<AndroidAuthSession> getDropboxApi(Context aContext) {
 		AppKeyPair appKeys = new AppKeyPair(DropboxUtils.APP_KEY, DropboxUtils.APP_SECRET);
-		AndroidAuthSession session = new AndroidAuthSession(appKeys, DropboxUtils.ACCESS_TYPE);
-		sCurrentSession = new DropboxAPI<AndroidAuthSession>(session);
+		AndroidAuthSession session = new AndroidAuthSession(appKeys);
+		sCurrentSession = new DropboxAPI<>(session);
 
 		setUpSession(aContext);
 
@@ -109,7 +103,6 @@ public class DropboxUtils {
 	/**
 	 * Clear all Authentication
 	 * 
-	 * @param aDropboxApi
 	 * @param aContext
 	 */
 	public static void clearAuthentication(Context aContext) {
@@ -119,7 +112,7 @@ public class DropboxUtils {
 		editor.remove(PREFS_APPKEY);
 		editor.remove(PREFS_APPSECRET);
 
-		editor.commit();
+		editor.apply();
 
 		// Unlink the current session
 		if (sCurrentSession != null) {
@@ -134,11 +127,8 @@ public class DropboxUtils {
 	 * @return true if we are linked, false otherwise
 	 */
 	public static boolean isLinked(Context aContext) {
-		if (sCurrentSession != null) {
-			return sCurrentSession.getSession().isLinked() && getStoredKeys(aContext) != null;
-		}
+		return sCurrentSession != null && sCurrentSession.getSession().isLinked() && getStoredKeys(aContext) != null;
 
-		return false;
 	}
 
 	/**
@@ -155,7 +145,7 @@ public class DropboxUtils {
 		editor.putString(PREFS_APPKEY, key);
 		editor.putString(PREFS_APPSECRET, secret);
 
-		editor.commit();
+		editor.apply();
 	}
 
 	/**
@@ -180,7 +170,7 @@ public class DropboxUtils {
 	 * @return a list of files
 	 */
 	public static List<String> getListOfFiles() {
-		List<String> toRet = new ArrayList<String>();
+		List<String> toRet = new ArrayList<>();
 
 		try {
 			List<Entry> result = sCurrentSession.search("", ".png", 0, false);

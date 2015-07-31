@@ -36,12 +36,12 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	/**
 	 * A list of paths that are drawn on the screen
 	 */
-	private List<PathWrapper> mPaths = new ArrayList<PathWrapper>();
+	private List<PathWrapper> mPaths = new ArrayList<>();
 
 	/**
 	 * The current path being updated
 	 */
-	private SparseArray<Path> mPathMap = new SparseArray<Path>();
+	private SparseArray<Path> mPathMap = new SparseArray<>();
 
 	/**
 	 * The painting parameters for the current Path
@@ -81,7 +81,7 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 		Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 
-		draw(canvas);
+		onDraw(canvas);
 
 		return bitmap;
 	}

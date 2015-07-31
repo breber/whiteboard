@@ -12,7 +12,6 @@ import net.margaritov.preference.colorpicker.ColorPickerDialog;
  */
 public class CustomColorPickerDialog extends ColorPickerDialog implements SeekBar.OnSeekBarChangeListener {
 
-    private SeekBar mPenSize;
     private OnPenSizeChangedListener mSizeListener;
 
     public interface OnPenSizeChangedListener {
@@ -28,7 +27,7 @@ public class CustomColorPickerDialog extends ColorPickerDialog implements SeekBa
         label.setText(R.string.choose_size);
         rightSide.addView(label);
 
-        mPenSize = new SeekBar(context);
+        SeekBar mPenSize = new SeekBar(context);
         mPenSize.setProgress(size);
         mPenSize.setOnSeekBarChangeListener(this);
         rightSide.addView(mPenSize);

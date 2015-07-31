@@ -12,7 +12,7 @@ public class CanvasThread extends Thread {
 	/**
 	 * The SurfaceHolder that contains the Canvas
 	 */
-	private SurfaceHolder mSurfaceHolder;
+	private final SurfaceHolder mSurfaceHolder;
 
 	/**
 	 * The SurfaceView that will draw the Canvas
