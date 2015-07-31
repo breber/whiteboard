@@ -1,10 +1,5 @@
 package com.brianreber.whiteboard;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.margaritov.preference.colorpicker.ColorPickerDialog.OnColorChangedListener;
-import net.margaritov.preference.colorpicker.ColorPickerDialog.OnPenSizeChangedListener;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -16,12 +11,17 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import net.margaritov.preference.colorpicker.ColorPickerDialog.OnColorChangedListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The SurfaceView allowing drawing
  * 
  * @author breber
  */
-public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Callback, OnColorChangedListener, OnPenSizeChangedListener {
+public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Callback, OnColorChangedListener, CustomColorPickerDialog.OnPenSizeChangedListener {
 
 	/**
 	 * The Thread that updates the UI
@@ -81,7 +81,7 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 		Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 
-		onDraw(canvas);
+		draw(canvas);
 
 		return bitmap;
 	}

@@ -1,13 +1,5 @@
 package com.brianreber.whiteboard;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Date;
-
-import net.margaritov.preference.colorpicker.ColorPickerDialog;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -36,6 +28,13 @@ import com.dropbox.client2.DropboxAPI.Entry;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.exception.DropboxUnlinkedException;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Date;
 
 public class WhiteboardActivity extends Activity {
 
@@ -144,7 +143,7 @@ public class WhiteboardActivity extends Activity {
 				int swatchColor = mSurface.getColor();
 				int penSize = mSurface.getPenSize();
 
-				ColorPickerDialog cpd = new ColorPickerDialog(WhiteboardActivity.this, swatchColor, penSize);
+				CustomColorPickerDialog cpd = new CustomColorPickerDialog(WhiteboardActivity.this, swatchColor, penSize);
 				cpd.setOnColorChangedListener(mSurface);
 				cpd.setOnPenSizeChangedListener(mSurface);
 				cpd.show();
