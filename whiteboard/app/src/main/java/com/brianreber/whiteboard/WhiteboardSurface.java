@@ -31,12 +31,12 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	/**
 	 * The base bitmap
 	 */
-	private Bitmap mBaseBitmap = null;
+	private static Bitmap mBaseBitmap = null;
 
 	/**
 	 * A list of paths that are drawn on the screen
 	 */
-	private List<PathWrapper> mPaths = new ArrayList<>();
+	private static List<PathWrapper> mPaths = new ArrayList<>();
 
 	/**
 	 * The current path being updated
@@ -46,7 +46,7 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	/**
 	 * The painting parameters for the current Path
 	 */
-	private Paint mPaint;
+	private static Paint mPaint;
 
 	/**
 	 * Represents whether multitouch drawing is enabled
@@ -63,13 +63,15 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 		getHolder().addCallback(this);
 		setFocusable(true);
 
-		mPaint = new Paint();
-		mPaint.setDither(false);
-		mPaint.setColor(Color.BLACK);
-		mPaint.setStyle(Paint.Style.STROKE);
-		mPaint.setStrokeJoin(Paint.Join.ROUND);
-		mPaint.setStrokeCap(Paint.Cap.ROUND);
-		mPaint.setStrokeWidth(7);
+        if (mPaint == null) {
+            mPaint = new Paint();
+            mPaint.setDither(false);
+            mPaint.setColor(Color.BLACK);
+            mPaint.setStyle(Paint.Style.STROKE);
+            mPaint.setStrokeJoin(Paint.Join.ROUND);
+            mPaint.setStrokeCap(Paint.Cap.ROUND);
+            mPaint.setStrokeWidth(7);
+        }
 	}
 
 	/**

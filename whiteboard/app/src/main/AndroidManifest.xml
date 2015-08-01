@@ -8,8 +8,7 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar.Fullscreen" >
         <activity
-            android:name=".WhiteboardActivity"
-            android:screenOrientation="sensorLandscape" >
+            android:name=".WhiteboardActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,8 +18,10 @@
         <activity
             android:name=".ListDropboxFiles"
             android:theme="@android:style/Theme.DeviceDefault.Light.DialogWhenLarge" />
-        <activity android:name=".WhiteboardPreferenceActivity" />
-        <activity android:name=".WhiteboardPreferenceActivitySupport" />
+        <activity android:name=".WhiteboardPreferenceActivity"
+            android:configChanges="orientation|keyboard" />
+        <activity android:name=".WhiteboardPreferenceActivitySupport"
+            android:configChanges="orientation|keyboard" />
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"
             android:configChanges="orientation|keyboard"
