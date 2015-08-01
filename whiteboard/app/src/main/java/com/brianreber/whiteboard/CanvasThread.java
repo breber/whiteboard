@@ -1,5 +1,6 @@
 package com.brianreber.whiteboard;
 
+import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
@@ -56,6 +57,7 @@ public class CanvasThread extends Thread {
 	/* (non-Javadoc)
 	 * @see java.lang.Thread#run()
 	 */
+	@SuppressLint("WrongCall")
 	@Override
 	public void run() {
 		Canvas c;

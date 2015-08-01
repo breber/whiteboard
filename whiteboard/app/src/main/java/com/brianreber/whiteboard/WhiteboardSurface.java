@@ -1,5 +1,6 @@
 package com.brianreber.whiteboard;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -79,7 +80,8 @@ public class WhiteboardSurface extends SurfaceView implements SurfaceHolder.Call
 	 * 
 	 * @return a Bitmap of the current state
 	 */
-	public Bitmap getBitmap() {
+	@SuppressLint("WrongCall")
+    public Bitmap getBitmap() {
 		Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 
